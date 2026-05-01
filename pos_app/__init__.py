@@ -67,7 +67,6 @@ def create_app():
 
     with app.app_context():
         db.create_all()
-        if User.query.count() == 0:
-            seed_initial_data()
+        seed_initial_data()
 
     return app
