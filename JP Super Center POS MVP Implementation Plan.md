@@ -1,0 +1,10 @@
+# Problem statement
+Build a POS system for JP Super Center from scratch that matches the provided board layout and workflows, including role-based login, sales/credit handling, inventory, tracking, expenses, reports, and settings, with MySQL as the primary database.
+## Current state
+The target project directory is empty, so the entire application architecture, database models, pages, and styling need to be created. The PDF defines required modules and data fields, and the screenshots define the visual layout and navigation pattern.
+## Proposed changes
+Implement a Flask-based web POS application with server-rendered templates and a MySQL-ready SQLAlchemy data layer. Create a shared layout (top bar + left sidebar) styled to match the screenshots and implement pages for Dashboard, Sales, Credit, Inventory, Tracking, Expenses, Reports, and Settings.
+Implement authentication with username/password and role assignment (Owner/Technician/Cashier), session-based access control, and login history tracking. Seed a default owner account and essential sample data.
+Implement core sales flow with auto bill number generation, item lines, discount calculation, payment handling (cash/card/credit), stock updates, and outstanding balance recording per customer. Implement credit settlement workflow including partial payments and remaining balance updates.
+Implement inventory CRUD with the required UOM list, customer tracking CRUD (including friend/guarantor fields), monthly and long-term expenses capture, and report views for bill lookup, daily/monthly summaries, low stock, expiring items, credit list, customer list, login history, and cashier summary.
+Provide setup assets including dependency file, environment-based database configuration, database initialization command, and run instructions so the app can be started locally and pointed at MySQL.

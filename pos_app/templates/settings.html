@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block content %}
+<h4 class="mb-3">System Settings</h4>
+<div class="row g-3">
+    {% if current_user.role == 'Technician' %}
+    <div class="col-xl-6">
+        <div class="panel">
+            <div class="panel-title">Shop Details</div>
+            <form method="post">
+                <input type="hidden" name="action" value="shop_profile">
+                <div class="mb-2">
+                    <label class="form-label">Shop Name</label>
+                    <input class="form-control form-control-sm" name="shop_name" value="{{ shop_settings.shop_name }}">
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Address</label>
+                    <input class="form-control form-control-sm" name="address" value="{{ shop_settings.address }}">
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Phone Number</label>
+                    <input class="form-control form-control-sm" name="phone" value="{{ shop_settings.phone }}">
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Email Address</label>
+                    <input class="form-control form-control-sm" name="email" value="{{ shop_settings.email }}">
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Bill Message</label>
+                    <input class="form-control form-control-sm" name="bill_message" value="{{ shop_settings.bill_message }}">
+                </div>
+                <div class="d-flex gap-2 mt-2">
+                    <button class="btn btn-sm btn-success">SAVE / UPDATE</button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="panel mt-3">
+            <div class="panel-title text-danger"><i class="fa-solid fa-database me-2"></i> Database Management (Restore)</div>
+            <div class="alert alert-warning py-2 small mb-2" style="font-size: 11px;">
+                <i class="fa-solid fa-triangle-exclamation"></i> <strong>Warning:</strong> Restoring a database will overwrite all current data permanently.
+            </div>
+            <form action="{{ url_for('main.restore') }}" method="post" enctype="multipart/form-data">
+                <div class="mb-2">
+                    <label class="form-label small">Select Backup File (.db)</label>
+                    <input type="file" name="backup_file" class="form-control form-control-sm" accept=".db" required>
+                </div>
+                <button type="submit" class="btn btn-sm btn-danger w-100" onclick="return confirm('Are you sure you want to restore this database? All current data will be lost!')">
+                    RESTORE DATABASE
+                </button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="col-xl-6">
+        {% if current_user.role == 'Technician' %}
+        <div class="panel mb-3">
+            <div class="panel-title">Device Setting</div>
+            <form method="post" class="row g-2">
+                <input type="hidden" name="action" value="add_device">
+                <div class="col-md-4">
+                    <input name="device_type" class="form-control form-control-sm" placeholder="Add Printer / Scanner" required>
+                </div>
+                <div class="col-md-4">
+                    <input name="device_name" class="form-control form-control-sm" placeholder="Device name" required>
+                </div>
+                <div class="col-md-4">
+                    <input name="description" class="form-control form-control-sm" placeholder="Description">
+                </div>
+                <div class="col-12">
+                    <button class="btn btn-sm btn-success">OK (Add)</button>
+                </div>
+            </form>
+            <div class="table-responsive mt-2">
+                <table class="table table-sm table-board">
+                    <thead><tr><th>Type</th><th>Name</th><th>Description</th><th></th></tr></thead>
+                    <tbody>
+                        {% for device in devices %}
+                            <tr>
+                                <td>{{ device.device_type }}</td>
+                                <td>{{ device.device_name }}</td>
+                                <td>{{ device.description }}</td>
+                                <td>
+                                    <form method="post">
+                                        <input type="hidden" name="action" value="delete_device">
+                                        <input type="hidden" name="device_id" value="{{ device.id }}">
+                                        <button class="btn btn-sm btn-danger">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="4" class="text-center text-muted">No devices added yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="panel">
+            <div class="panel-title">User Account Management</div>
+            <form method="post" class="row g-2">
+                <input type="hidden" name="action" value="add_user">
+                <div class="col-md-4">
+                    <input name="username" class="form-control form-control-sm" placeholder="User Name" required>
+                </div>
+                <div class="col-md-4">
+                    <input type="password" name="password" class="form-control form-control-sm" placeholder="Password" required>
+                </div>
+                <div class="col-md-4">
+                    <select name="role" class="form-select form-select-sm">
+                        {% if current_user.role == 'Technician' %}
+                        <option value="Technician">Technician</option>
+                        <option value="Owner">Owner</option>
+                        {% endif %}
+                        <option value="Cashier">Cashier</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <button class="btn btn-sm btn-success">OK (Add User)</button>
+                </div>
+            </form>
+            <div class="table-responsive mt-2">
+                <table class="table table-sm table-board">
+                    <thead><tr><th>User Name</th><th>Role</th><th></th></tr></thead>
+                    <tbody>
+                        {% for user in users %}
+                            <tr>
+                                <td>{{ user.username }}</td>
+                                <td>{{ user.role }}</td>
+                                <td>
+                                    <form method="post">
+                                        <input type="hidden" name="action" value="delete_user">
+                                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                                        <button class="btn btn-sm btn-danger">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="3" class="text-center text-muted">No users available.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

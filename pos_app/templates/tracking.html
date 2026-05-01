@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block content %}
+<h4 class="mb-3">Customer Tracking & Profile</h4>
+
+<div class="panel mb-3">
+    <form method="post">
+        <input type="hidden" name="customer_id" value="{{ editing_customer.id if editing_customer else '' }}">
+        <div class="row g-3">
+            <div class="col-xl-6">
+                <div class="sub-panel">
+                    <div class="fw-semibold mb-2">Primary Customer Details</div>
+                    <div class="row g-2">
+                        <div class="col-12">
+                            <label class="form-label">Customer Barcode</label>
+                            <input name="barcode" class="form-control form-control-sm" value="{{ editing_customer.barcode if editing_customer else '' }}">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Customer Name</label>
+                            <input name="name" class="form-control form-control-sm" value="{{ editing_customer.name if editing_customer else '' }}" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Address</label>
+                            <input name="address" class="form-control form-control-sm" value="{{ editing_customer.address if editing_customer else '' }}">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Phone Number</label>
+                            <input name="phone" class="form-control form-control-sm" value="{{ editing_customer.phone if editing_customer else '' }}">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">ID Number (NIC)</label>
+                            <input name="nic" class="form-control form-control-sm" value="{{ editing_customer.nic if editing_customer else '' }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-6">
+                <div class="sub-panel">
+                    <div class="fw-semibold mb-2">Friend / Guarantor Details</div>
+                    <div class="row g-2">
+                        <div class="col-12">
+                            <label class="form-label">Friend Name</label>
+                            <input name="friend_name" class="form-control form-control-sm" value="{{ editing_customer.friend_name if editing_customer else '' }}">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Friend Phone</label>
+                            <input name="friend_phone" class="form-control form-control-sm" value="{{ editing_customer.friend_phone if editing_customer else '' }}">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Friend Address</label>
+                            <input name="friend_address" class="form-control form-control-sm" value="{{ editing_customer.friend_address if editing_customer else '' }}">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Other Details</label>
+                            <input name="other_details" class="form-control form-control-sm" value="{{ editing_customer.other_details if editing_customer else '' }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex gap-2 mt-3">
+            <button class="btn btn-success btn-sm">SAVE CUSTOMER</button>
+            <a href="{{ url_for('main.tracking') }}" class="btn btn-secondary btn-sm">CLEAR</a>
+            {% if editing_customer %}
+                <button class="btn btn-danger btn-sm" name="action" value="delete" onclick="return confirm('Delete this customer?')">DELETE</button>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<div class="panel">
+    <div class="panel-title d-flex justify-content-between align-items-center">
+        <span>Customer List</span>
+        <div class="col-md-5">
+            <input type="text" id="customerSearch" class="form-control form-control-sm" placeholder="Search by name, phone or NIC...">
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-sm table-board" id="customerTable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Barcode</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>NIC</th>
+                    <th>Friend Name</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for customer in customers %}
+                    <tr class="customer-row">
+                        <td>{{ loop.index }}</td>
+                        <td>{{ customer.barcode }}</td>
+                        <td class="customer-name">{{ customer.name }}</td>
+                        <td class="customer-phone">{{ customer.phone or '-' }}</td>
+                        <td class="customer-nic">{{ customer.nic or '-' }}</td>
+                        <td>{{ customer.friend_name or '-' }}</td>
+                        <td>
+                            <a href="{{ url_for('main.tracking', edit_id=customer.id) }}" class="btn btn-xs btn-primary py-0 px-2" style="font-size: 11px;">Edit</a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="7" class="text-center text-muted">No customers yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('customerSearch').addEventListener('keyup', function() {
+        const query = this.value.toLowerCase();
+        document.querySelectorAll('.customer-row').forEach(row => {
+            const name = row.querySelector('.customer-name').textContent.toLowerCase();
+            const phone = row.querySelector('.customer-phone').textContent.toLowerCase();
+            const nic = row.querySelector('.customer-nic').textContent.toLowerCase();
+            if (name.includes(query) || phone.includes(query) || nic.includes(query)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+{% block content %}
+<h4 class="mb-3">Dashboard</h4>
+
+<div class="row g-3 mb-3">
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card bg-purple">
+            <div class="stat-label">PURCHASE DUE</div>
+            <div class="stat-value">$ {{ purchase_due|money }}</div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card bg-orange">
+            <div class="stat-label">SALES DUE</div>
+            <div class="stat-value">$ {{ sales_due|money }}</div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card bg-green">
+            <div class="stat-label">SALES</div>
+            <div class="stat-value">$ {{ sales_total|money }}</div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card bg-blue">
+            <div class="stat-label">EXPENSE</div>
+            <div class="stat-value">$ {{ expense_total|money }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-xl-3 col-md-6">
+        <div class="mini-card">Customers <span>{{ customers_count }}</span></div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="mini-card">Suppliers <span>{{ suppliers_count }}</span></div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="mini-card">Purchases <span>{{ purchases_count }}</span></div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="mini-card">Invoices <span>{{ invoices_count }}</span></div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-xl-7">
+        <div class="panel h-100">
+            <div class="panel-title">Purchase, Sales & Expense Bar Chart</div>
+            <canvas id="salesTrendChart" height="110"></canvas>
+        </div>
+    </div>
+    <div class="col-xl-5">
+        <div class="panel h-100">
+            <div class="panel-title">Recent Sales Invoices</div>
+            <div class="table-responsive">
+                <table class="table table-sm table-board">
+                    <thead>
+                        <tr>
+                            <th>SLNo</th>
+                            <th>Date</th>
+                            <th>Invoice ID</th>
+                            <th>Customer</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sale in recent_sales %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ sale.sale_datetime.strftime('%d-%m-%Y') }}</td>
+                                <td>{{ sale.bill_no }}</td>
+                                <td>{{ sale.customer.name if sale.customer else 'Walk-in customer' }}</td>
+                                <td>$ {{ sale.total_amount|money }}</td>
+                                <td><span class="badge {% if sale.balance_amount > 0 %}bg-danger{% else %}bg-success{% endif %}">{% if sale.balance_amount > 0 %}Unpaid{% else %}Paid{% endif %}</span></td>
+                                <td>
+                                    <a href="{{ url_for('main.print_sale', sale_id=sale.id) }}" target="_blank" class="btn btn-xs btn-outline-primary py-0 px-1" style="font-size: 10px;">
+                                        <i class="fa-solid fa-print"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="7" class="text-center text-muted">No sales yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mt-1">
+    <div class="col-xl-7">
+        <div class="panel">
+            <div class="panel-title">Top 10 Trending Items</div>
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <canvas id="trendingChart" height="180"></canvas>
+                </div>
+                <div class="col-lg-6">
+                    <ul class="list-group list-group-flush">
+                        {% for row in trending_rows %}
+                            <li class="list-group-item d-flex justify-content-between px-0">
+                                <span>{{ row.description }}</span>
+                                <strong>{{ row.qty_sold }}</strong>
+                            </li>
+                        {% else %}
+                            <li class="list-group-item px-0 text-muted">No item trend data yet.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-5">
+        <div class="panel">
+            <div class="panel-title">Credit Due Customers</div>
+            <div class="table-responsive">
+                <table class="table table-sm table-board">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Customer</th>
+                            <th>Due Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for debtor in debtors %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ debtor.customer_name }}</td>
+                                <td>$ {{ debtor.due|money }}</td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="3" class="text-muted text-center">No outstanding credit.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+<div class="row g-3 mt-1">
+    <div class="col-12">
+        <div class="panel">
+            <div class="panel-title">RECENTLY ADDED ITEMS</div>
+            <div class="table-responsive">
+                <table class="table table-sm table-board">
+                    <thead>
+                        <tr>
+                            <th>SLNo</th>
+                            <th>Item Name</th>
+                            <th>Item Sales Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in recent_items %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ item.name }}</td>
+                                <td>$ {{ item.selling_price|money }}</td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="3" class="text-center text-muted">No items added recently.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const trendCtx = document.getElementById('salesTrendChart');
+    if (trendCtx) {
+        new Chart(trendCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ chart_days|tojson }},
+                datasets: [{
+                    label: 'Sales',
+                    data: {{ chart_values|tojson }},
+                    backgroundColor: '#ff4e1f'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: true }
+                }
+            }
+        });
+    }
+
+    const trendPie = document.getElementById('trendingChart');
+    if (trendPie) {
+        new Chart(trendPie, {
+            type: 'doughnut',
+            data: {
+                labels: {{ trending_labels|tojson }},
+                datasets: [{
+                    data: {{ trending_values|tojson }},
+                    backgroundColor: ['#6366f1', '#ec4899', '#14b8a6', '#ca8a04', '#f97316', '#111827', '#60a5fa', '#e879f9', '#a3e635', '#f43f5e']
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

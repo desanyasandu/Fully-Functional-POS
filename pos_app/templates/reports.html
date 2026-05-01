@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block content %}
+<h4 class="mb-3">Report Board</h4>
+
+<div class="panel mb-3">
+    <form method="get" class="row g-2 align-items-end">
+        <div class="col-lg-4">
+            <label class="form-label">Bill No View</label>
+            <input class="form-control form-control-sm" name="bill_no" value="{{ bill_no }}" placeholder="Enter bill no">
+        </div>
+        <div class="col-lg-2">
+            <button class="btn btn-sm btn-success w-100">View</button>
+        </div>
+    </form>
+    {% if bill_sale %}
+        <div class="alert alert-info mt-3 mb-0">
+            Bill <strong>{{ bill_sale.bill_no }}</strong> | Customer:
+            <strong>{{ bill_sale.customer.name if bill_sale.customer else 'Walk-in customer' }}</strong> |
+            Total: <strong>{{ bill_sale.total_amount|money }}</strong> |
+            Date: {{ bill_sale.sale_datetime.strftime('%Y-%m-%d %H:%M') }}
+        </div>
+    {% endif %}
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-lg-3"><div class="mini-card">Daily Summary <span>{{ daily_sales|money }}</span></div></div>
+    <div class="col-lg-3"><div class="mini-card">Monthly Summary <span>{{ monthly_sales|money }}</span></div></div>
+    <div class="col-lg-3"><div class="mini-card">Monthly Expenses <span>{{ monthly_expenses|money }}</span></div></div>
+    <div class="col-lg-3"><div class="mini-card">Stock Summary <span>{{ stock_summary|money }}</span></div></div>
+</div>
+
+<div class="row g-3">
+    <div class="col-xl-6">
+        <div class="panel mb-3">
+            <div class="panel-title">Low Stock View</div>
+            <div class="table-responsive">
+                <table class="table table-sm table-board">
+                    <thead><tr><th>Item</th><th>Stock</th></tr></thead>
+                    <tbody>
+                        {% for item in low_stock_items %}
+                            <tr><td>{{ item.name }}</td><td>{{ item.current_stock }}</td></tr>
+                        {% else %}
+                            <tr><td colspan="2" class="text-center text-muted">No low stock items.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="panel mb-3">
+            <div class="panel-title">Expire List View</div>
+            <div class="table-responsive">
+                <table class="table table-sm table-board">
+                    <thead><tr><th>Item</th><th>EXP</th></tr></thead>
+                    <tbody>
+                        {% for item in expiring_items %}
+                            <tr><td>{{ item.name }}</td><td>{{ item.exp }}</td></tr>
+                        {% else %}
+                            <tr><td colspan="2" class="text-center text-muted">No expiring items in 30 days.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">Sale Analysis Summary View</div>
+            <div class="table-responsive">
+                <table class="table table-sm table-board">
+                    <thead><tr><th>Item</th><th>Qty</th><th>Total</th></tr></thead>
+                    <tbody>
+                        {% for row in sale_analysis %}
+                            <tr>
+                                <td>{{ row.description }}</td>
+                                <td>{{ row.qty }}</td>
+                                <td>{{ row.total|money }}</td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="3" class="text-center text-muted">No sale analysis data.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-6">
+        <div class="panel mb-3">
+            <div class="panel-title">Supplier Details View</div>
+            <div class="table-responsive">
+                <table class="table table-sm table-board">
+                    <thead><tr><th>Supplier</th><th>Items</th></tr></thead>
+                    <tbody>
+                        {% for supplier in supplier_details %}
+                            <tr><td>{{ supplier.supplier_name }}</td><td>{{ supplier.item_count }}</td></tr>
+                        {% else %}
+                            <tr><td colspan="2" class="text-center text-muted">No supplier data.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="panel mb-3">
+            <div class="panel-title">Credit List View</div>
+            <div class="table-responsive">
+                <table class="table table-sm table-board">
+                    <thead><tr><th>Bill</th><th>Customer</th><th>Balance</th></tr></thead>
+                    <tbody>
+                        {% for credit in credit_list %}
+                            <tr>
+                                <td>{{ credit.bill_no }}</td>
+                                <td>{{ credit.customer.name if credit.customer else '-' }}</td>
+                                <td>{{ credit.remaining_balance|money }}</td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="3" class="text-center text-muted">No credit list data.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="panel mb-3">
+            <div class="panel-title">Customer List View</div>
+            <div class="table-responsive">
+                <table class="table table-sm table-board">
+                    <thead><tr><th>Name</th><th>Phone</th></tr></thead>
+                    <tbody>
+                        {% for customer in customer_list %}
+                            <tr><td>{{ customer.name }}</td><td>{{ customer.phone or '-' }}</td></tr>
+                        {% else %}
+                            <tr><td colspan="2" class="text-center text-muted">No customers found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="panel mb-3">
+            <div class="panel-title">Login History View</div>
+            <div class="table-responsive">
+                <table class="table table-sm table-board">
+                    <thead><tr><th>User</th><th>Time</th><th>Status</th></tr></thead>
+                    <tbody>
+                        {% for log in login_history %}
+                            <tr>
+                                <td>{{ log.user.username if log.user else '-' }}</td>
+                                <td>{{ log.login_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>{{ 'Success' if log.success else 'Failed' }}</td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="3" class="text-center text-muted">No login history found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">Cashier Summary View</div>
+            <div class="table-responsive">
+                <table class="table table-sm table-board">
+                    <thead><tr><th>Cashier</th><th>Invoices</th><th>Total</th></tr></thead>
+                    <tbody>
+                        {% for row in cashier_summary %}
+                            <tr><td>{{ row.username }}</td><td>{{ row.invoice_count }}</td><td>{{ row.total|money }}</td></tr>
+                        {% else %}
+                            <tr><td colspan="3" class="text-center text-muted">No cashier summary yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

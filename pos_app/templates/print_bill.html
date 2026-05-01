@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bill #{{ sale.bill_no }}</title>
+    <style>
+        body { font-family: 'Courier New', Courier, monospace; font-size: 12px; margin: 0; padding: 20px; color: #000; }
+        .receipt { max-width: 300px; margin: 0 auto; border: 1px solid #eee; padding: 10px; }
+        .header { text-align: center; margin-bottom: 10px; }
+        .shop-name { font-weight: bold; font-size: 16px; margin-bottom: 5px; }
+        .separator { border-top: 1px dashed #000; margin: 8px 0; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; }
+        .text-right { text-align: right; }
+        .footer { text-align: center; margin-top: 15px; font-size: 10px; }
+        @media print {
+            body { padding: 0; }
+            .receipt { border: none; width: 100%; max-width: none; }
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="no-print" style="text-align: center; margin-bottom: 20px;">
+        <button onclick="window.print()" style="padding: 10px 20px; cursor: pointer; background: #0ea5e9; color: #fff; border: none; border-radius: 4px;">Print Receipt</button>
+        <button onclick="window.close()" style="padding: 10px 20px; cursor: pointer; background: #64748b; color: #fff; border: none; border-radius: 4px; margin-left: 10px;">Close</button>
+    </div>
+
+    <div class="receipt">
+        <div class="header">
+            <div class="shop-name">{{ shop_settings.shop_name }}</div>
+            <div>{{ shop_settings.address or 'N/A' }}</div>
+            <div>Tel: {{ shop_settings.phone or 'N/A' }}</div>
+        </div>
+
+        <div class="separator"></div>
+
+        <div>Bill No: {{ sale.bill_no }}</div>
+        <div>Date: {{ sale.sale_datetime.strftime('%Y-%m-%d %H:%M') }}</div>
+        <div>Customer: {{ sale.customer.name if sale.customer else 'Walk-in' }}</div>
+        <div>Cashier: {{ sale.cashier.username if sale.cashier else 'System' }}</div>
+
+        <div class="separator"></div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th class="text-right">Qty</th>
+                    <th class="text-right">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in sale.items %}
+                <tr>
+                    <td colspan="3">{{ item.description }}</td>
+                </tr>
+                <tr>
+                    <td>@{{ item.unit_price|money }}</td>
+                    <td class="text-right">{{ item.qty - item.return_qty }}</td>
+                    <td class="text-right">{{ item.line_total|money }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="separator"></div>
+
+        <table>
+            <tr>
+                <td>Sub Total:</td>
+                <td class="text-right">{{ sale.subtotal|money }}</td>
+            </tr>
+            <tr>
+                <td>Discount:</td>
+                <td class="text-right">-{{ sale.discount_amount|money }}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold;">Net Total:</td>
+                <td class="text-right" style="font-weight: bold;">{{ sale.total_amount|money }}</td>
+            </tr>
+            <tr>
+                <td>Paid Amount:</td>
+                <td class="text-right">{{ sale.paid_amount|money }}</td>
+            </tr>
+            <tr>
+                <td>Balance:</td>
+                <td class="text-right">{{ sale.balance_amount|money }}</td>
+            </tr>
+        </table>
+
+        <div class="separator"></div>
+
+        <div class="footer">
+            <div>{{ shop_settings.bill_message or 'Thank you for shopping with us!' }}</div>
+            <div style="margin-top: 5px;">Powered by NCS Billing Book</div>
+        </div>
+    </div>
+
+    <script>
+        // Auto-print if possible
+        // window.onload = () => { window.print(); };
+    </script>
+</body>
+</html>

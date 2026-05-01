@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block content %}
+<h4 class="mb-3">Inventory Stock Management</h4>
+
+<div class="row g-3">
+    <div class="col-xl-4">
+        <div class="panel">
+            <div class="panel-title">{{ "Edit Item" if editing_item else "Add Item" }}</div>
+            <form method="post" class="row g-2">
+                <input type="hidden" name="item_id" value="{{ editing_item.id if editing_item else '' }}">
+                <div class="col-12">
+                    <label class="form-label">Barcode</label>
+                    <input type="text" class="form-control form-control-sm" name="barcode" value="{{ editing_item.barcode if editing_item else '' }}" required>
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Item Name</label>
+                    <input type="text" class="form-control form-control-sm" name="name" value="{{ editing_item.name if editing_item else '' }}" required>
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Description</label>
+                    <input type="text" class="form-control form-control-sm" name="description" value="{{ editing_item.description if editing_item else '' }}">
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Selling Price</label>
+                    <input type="number" step="0.01" class="form-control form-control-sm" name="selling_price" value="{{ editing_item.selling_price if editing_item else '0' }}">
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Current Stock</label>
+                    <input type="number" step="0.01" class="form-control form-control-sm" name="current_stock" value="{{ editing_item.current_stock if editing_item else '0' }}">
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Buying Price</label>
+                    <input type="number" step="0.01" class="form-control form-control-sm" name="buying_price" value="{{ editing_item.buying_price if editing_item else '0' }}">
+                </div>
+                <div class="col-6">
+                    <label class="form-label">UOM</label>
+                    <select name="uom" class="form-select form-select-sm">
+                        {% for uom in uom_choices %}
+                            <option value="{{ uom }}" {% if editing_item and editing_item.uom == uom %}selected{% endif %}>{{ uom }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-6">
+                    <label class="form-label">MFD</label>
+                    <input type="date" class="form-control form-control-sm" name="mfd" value="{{ editing_item.mfd if editing_item and editing_item.mfd else '' }}">
+                </div>
+                <div class="col-6">
+                    <label class="form-label">EXP</label>
+                    <input type="date" class="form-control form-control-sm" name="exp" value="{{ editing_item.exp if editing_item and editing_item.exp else '' }}">
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Date Added</label>
+                    <input type="date" class="form-control form-control-sm" name="date_added" value="{{ editing_item.date_added if editing_item and editing_item.date_added else '' }}">
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Supplier Name</label>
+                    <input type="text" class="form-control form-control-sm" name="supplier_name" value="{{ editing_item.supplier_name if editing_item else '' }}">
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Supplier Contact</label>
+                    <input type="text" class="form-control form-control-sm" name="supplier_contact" value="{{ editing_item.supplier_contact if editing_item else '' }}">
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Other Suppliers</label>
+                    <input type="text" class="form-control form-control-sm" name="other_suppliers" value="{{ editing_item.other_suppliers if editing_item else '' }}">
+                </div>
+                <div class="col-12 d-flex gap-2 mt-2">
+                    <button class="btn btn-sm btn-success">OK (Add)</button>
+                    <a href="{{ url_for('main.inventory') }}" class="btn btn-sm btn-secondary">Clear</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="col-xl-8">
+        <div class="panel">
+            <div class="panel-title d-flex justify-content-between align-items-center">
+                <span>Inventory Items</span>
+                <div class="col-md-5">
+                    <input type="text" id="inventorySearch" class="form-control form-control-sm" placeholder="Search by name or barcode...">
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm table-board" id="inventoryTable">
+                    <thead>
+                        <tr>
+                            <th>SN</th>
+                            <th>BARCODE</th>
+                            <th>DESC</th>
+                            <th>PRICE</th>
+                            <th>STOCK</th>
+                            <th>UOM</th>
+                            <th>EXP</th>
+                            <th>SUPPLIER</th>
+                            <th>ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                            <tr class="inventory-row">
+                                <td>{{ loop.index }}</td>
+                                <td class="item-barcode">{{ item.barcode }}</td>
+                                <td class="item-name">{{ item.name }}</td>
+                                <td>{{ item.selling_price|money }}</td>
+                                <td>
+                                    <span class="badge {% if item.current_stock <= 5 %}bg-danger{% else %}bg-success{% endif %}">
+                                        {{ item.current_stock }}
+                                    </span>
+                                </td>
+                                <td>{{ item.uom }}</td>
+                                <td>{{ item.exp or '-' }}</td>
+                                <td>{{ item.supplier_name or '-' }}</td>
+                                <td>
+                                    <a href="{{ url_for('main.inventory', edit_id=item.id) }}" class="btn btn-xs btn-primary py-0 px-2" style="font-size: 11px;">Edit</a>
+                                    <form method="post" class="d-inline" onsubmit="return confirm('Delete this item?')">
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                                        <button class="btn btn-xs btn-danger py-0 px-2" style="font-size: 11px;">Del</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="9" class="text-center text-muted">No inventory records found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('inventorySearch').addEventListener('keyup', function() {
+        const query = this.value.toLowerCase();
+        document.querySelectorAll('.inventory-row').forEach(row => {
+            const name = row.querySelector('.item-name').textContent.toLowerCase();
+            const barcode = row.querySelector('.item-barcode').textContent.toLowerCase();
+            if (name.includes(query) || barcode.includes(query)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock %}

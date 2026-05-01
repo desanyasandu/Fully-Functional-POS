@@ -1,0 +1,193 @@
+body {
+    background: #f1f4f9;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    color: #1f2937;
+}
+
+.app-shell {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 220px;
+    background: #18324b;
+    color: #dbeafe;
+    display: flex;
+    flex-direction: column;
+}
+
+.brand {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    color: #fff;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 8px;
+}
+
+.menu-link {
+    color: #dbeafe;
+    text-decoration: none;
+    padding: 10px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    display: block;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+}
+
+.menu-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.menu-link.active {
+    background: #0ea5e9;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+}
+
+.sub-link {
+    font-size: 13px;
+    padding: 6px 12px;
+    opacity: 0.8;
+}
+
+.sub-link:hover {
+    opacity: 1;
+}
+
+.menu-group {
+    margin-bottom: 2px;
+}
+
+.main-pane {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.topbar {
+    min-height: 70px;
+    background: #0f3f7f;
+    color: #fff;
+    border-bottom: 2px solid #0ea5e9;
+}
+
+.content-pane {
+    flex: 1;
+}
+
+.panel {
+    background: #fff;
+    border: 1px solid #dbe3f2;
+    border-top: 3px solid #1680c3;
+    border-radius: 4px;
+    padding: 12px;
+}
+
+.sub-panel {
+    background: #f8fafc;
+    border: 1px solid #dbe3f2;
+    border-radius: 4px;
+    padding: 10px;
+}
+
+.panel-title {
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #0f172a;
+}
+
+.board-subtitle {
+    font-weight: 600;
+    color: #1d4ed8;
+}
+
+.table-board {
+    font-size: 13px;
+    margin-bottom: 0;
+}
+
+.table-board thead th {
+    background: #edf2f9;
+    color: #334155;
+}
+
+.stat-card {
+    border-radius: 10px;
+    color: #fff;
+    padding: 14px;
+    min-height: 94px;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+}
+
+.stat-label {
+    font-size: 13px;
+    letter-spacing: 0.5px;
+}
+
+.stat-value {
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1;
+    margin-top: 10px;
+}
+
+.bg-purple {
+    background: linear-gradient(135deg, #b75def, #cc4fd8);
+}
+
+.bg-orange {
+    background: linear-gradient(135deg, #ff7f31, #ff4557);
+}
+
+.bg-green {
+    background: linear-gradient(135deg, #10b981, #31a8cc);
+}
+
+.bg-blue {
+    background: linear-gradient(135deg, #162a8b, #2090f1);
+}
+
+.mini-card {
+    background: #fff;
+    border: 1px solid #dbe3f2;
+    border-radius: 8px;
+    min-height: 70px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    font-weight: 600;
+    color: #334155;
+}
+
+.mini-card span {
+    font-size: 26px;
+    color: #0f172a;
+}
+
+.summary-bar {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    background: #f8fafc;
+    border: 1px solid #dbe3f2;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 14px;
+}
+
+.login-bg {
+    background: radial-gradient(circle at top left, #0f3f7f, #020617);
+    min-height: 100vh;
+}
+
+.login-header {
+    background: linear-gradient(90deg, #0f3f7f, #1d4ed8);
+}
